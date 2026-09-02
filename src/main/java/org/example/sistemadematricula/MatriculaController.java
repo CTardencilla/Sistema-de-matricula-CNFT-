@@ -262,3 +262,324 @@ public class MatriculaController {
 
 
  //Continuacion del codigo de mi compañero
+
+// ========================================================
+        // VALIDAR CONTRASEÑA
+        // ========================================================
+
+        if (contrasena.isEmpty()) {
+
+            mostrarError(
+                    "Debe ingresar una contraseña."
+            );
+
+            return;
+        }
+
+
+        if (contrasena.length() < 8) {
+
+            mostrarError(
+                    "La contraseña debe tener al menos 8 caracteres."
+            );
+
+            return;
+        }
+
+
+        // ========================================================
+        // VALIDAR FECHA
+        // ========================================================
+
+        if (dpFechaNacimiento.getValue() == null) {
+
+            mostrarError(
+                    "Debe seleccionar la fecha de nacimiento."
+            );
+
+            return;
+        }
+
+
+        if (dpFechaNacimiento.getValue().isAfter(LocalDate.now())) {
+
+            mostrarError(
+                    "La fecha de nacimiento no puede ser una fecha futura."
+            );
+
+            return;
+        }
+
+
+        // ========================================================
+        // VALIDAR DEPARTAMENTO
+        // ========================================================
+
+        if (cbDepartamento.getValue() == null) {
+
+            mostrarError(
+                    "Debe seleccionar un departamento."
+            );
+
+            return;
+        }
+
+
+        // ========================================================
+        // VALIDAR CURSO
+        // ========================================================
+
+        String curso =
+                lvCursos.getSelectionModel().getSelectedItem();
+
+
+        if (curso == null) {
+
+            mostrarError(
+                    "Debe seleccionar un curso."
+            );
+
+            return;
+        }
+
+
+        // ========================================================
+        // VALIDAR MODALIDAD
+        // ========================================================
+
+        if (!rbPresencial.isSelected()
+                && !rbVirtual.isSelected()) {
+
+            mostrarError(
+                    "Debe seleccionar una modalidad: presencial o virtual."
+            );
+
+            return;
+        }
+
+
+        // ========================================================
+        // VALIDAR HORARIO
+        // ========================================================
+
+        if (!chkManana.isSelected()
+                && !chkTarde.isSelected()
+                && !chkNoche.isSelected()) {
+
+            mostrarError(
+                    "Debe seleccionar al menos un horario."
+            );
+
+            return;
+        }
+
+
+        // ========================================================
+        // VALIDAR NORMAS
+        // ========================================================
+
+        if (!chkNormas.isSelected()) {
+
+            mostrarError(
+                    "Debe aceptar las normas del centro."
+            );
+
+            return;
+        }
+
+
+        // ========================================================
+        // NOMBRE COMPLETO
+        // ========================================================
+
+        String nombreCompleto =
+                nombres + " " + apellidos;
+
+
+        // ========================================================
+        // MODALIDAD
+        // ========================================================
+
+        String modalidad;
+
+        if (rbPresencial.isSelected()) {
+
+            modalidad = "Presencial";
+
+        } else {
+
+            modalidad = "Virtual";
+        }
+
+
+        // ========================================================
+        // HORARIO
+        // ========================================================
+
+        String horario = obtenerHorarios();
+
+
+        // ========================================================
+        // CREAR ESTUDIANTE
+        // ========================================================
+
+        Estudiante estudiante = new Estudiante(
+                nombreCompleto,
+                cbDepartamento.getValue(),
+                curso,
+                modalidad,
+                horario,
+                dpFechaNacimiento.getValue()
+        );
+
+
+        // ========================================================
+        // AGREGAR ESTUDIANTE A LA TABLA
+        // ========================================================
+
+        listaEstudiantes.add(estudiante);
+
+
+        // ========================================================
+        // MENSAJE DE ÉXITO
+        // ========================================================
+
+        mostrarInformacion(
+                "Matrícula realizada correctamente",
+                "El estudiante " + nombreCompleto
+                        + " fue matriculado en el curso de "
+                        + curso + "."
+        );
+
+
+        // Limpiar formulario
+        limpiarFormulario();
+    }
+
+
+    // ============================================================
+    // OBTENER HORARIOS
+    // ============================================================
+
+    private String obtenerHorarios() {
+
+        StringBuilder horario = new StringBuilder();
+
+
+        if (chkManana.isSelected()) {
+
+            horario.append("Mañana");
+        }
+
+
+        if (chkTarde.isSelected()) {
+
+            if (horario.length() > 0) {
+                horario.append(", ");
+            }
+
+            horario.append("Tarde");
+        }
+
+
+        if (chkNoche.isSelected()) {
+
+            if (horario.length() > 0) {
+                horario.append(", ");
+            }
+
+            horario.append("Noche");
+        }
+
+
+        return horario.toString();
+    }
+
+
+    // ============================================================
+    // LIMPIAR FORMULARIO
+    // ============================================================
+
+    @FXML
+    private void limpiarFormulario() {
+
+        txtNombres.clear();
+
+        txtApellidos.clear();
+
+        txtUsuario.clear();
+
+        txtContrasena.clear();
+
+        dpFechaNacimiento.setValue(null);
+
+        cbDepartamento.getSelectionModel().clearSelection();
+
+        lvCursos.getSelectionModel().clearSelection();
+
+        grupoModalidad.selectToggle(null);
+
+        chkManana.setSelected(false);
+
+        chkTarde.setSelected(false);
+
+        chkNoche.setSelected(false);
+
+        chkNormas.setSelected(false);
+
+        txtNombres.requestFocus();
+    }
+
+
+    // ============================================================
+    // ALERT DE ERROR
+    // ============================================================
+
+    private void mostrarError(String mensaje) {
+
+        Alert alerta =
+                new Alert(Alert.AlertType.ERROR);
+
+        alerta.setTitle(
+                "Error de validación"
+        );
+
+        alerta.setHeaderText(
+                "No se pudo realizar la matrícula"
+        );
+
+        alerta.setContentText(
+                mensaje
+        );
+
+        alerta.showAndWait();
+    }
+
+
+    // ============================================================
+    // ALERT DE INFORMACIÓN
+    // ============================================================
+
+    private void mostrarInformacion(
+            String encabezado,
+            String mensaje
+    ) {
+
+        Alert alerta =
+                new Alert(Alert.AlertType.INFORMATION);
+
+        alerta.setTitle(
+                "Sistema de Matrícula"
+        );
+
+        alerta.setHeaderText(
+                encabezado
+        );
+
+        alerta.setContentText(
+                mensaje
+        );
+
+        alerta.showAndWait();
+    }
+}
